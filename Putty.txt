@@ -1,0 +1,25 @@
+Here's a few lines from /etc/ssh/sshd_config
+
+X11Forwarding yes
+X11DisplayOffset 10
+PrintMotd no
+PrintLastLog yes
+TCPKeepAlive yes
+#UseLogin no
+
+
+XQuartz installation for putty
+
+Sudo port install putty
+
+Cp /opt/local/bin/putty ~/Desktop/PuTTY
+
+Open XQuartz and type putty
+
+
+For XQuartz copy paste option:
+
+You need to middle-click to paste the contents of the OS X Pasteboard (as the X11 settings call it.) If you don't have a middle mouse button, 
+turn on "Emulate three button mouse" in the X11 Preferences under the "Input" tab, 
+along with "Enable syncing" and "Update PRIMARY when Pasteboard changes" under the "Pasteboard" tab. 
+Then you can paste whatever you copied in the rest of Mac OS X by holding down Option and clicking.

@@ -1,0 +1,235 @@
+vagrant init bento/centos-7.5
+config.vm.network "private_network", ip: "192.168.33.10"
+Uncomment config, memory and end
+
+vagrant up
+
+vagrant ssh
+
+//add new user
+sudo adduser raj
+
+//to set password
+sudo passwd raj
+
+Logout and login again
+
+//to give sudoers permission
+sudo usermod -aG wheel raj
+
+To verify sudo access:
+su raj
+sudo ls -la /root
+you can list the contents of the /root directory, which is normally only accessible to the root user.
+
+Create the .ssh directory:
+mkdir ~/.ssh
+
+Set the right permissions:
+chmod 700 ~/.ssh
+
+Create the authorized_keys file:
+touch ~/.ssh/authorized_keys
+
+Set the right permissions:
+chmod 600 ~/.ssh/authorized_keys
+
+The permissions are important! It won't work without the right permissions!
+
+Our machine ssh
+  cat ~/.ssh/id_rsa.pub
+
+Paste in linux server
+  echo <paste-your-key-here> >> ~/.ssh/authorized_keys
+  chmod 600 ~/.ssh/authorized_keys
+
+Check permission
+ls -ltra
+total 20
+drwxr-xr-x  3 raja   raja   4096 Mar 17 07:54 raja
+drwxr-xr-x 23 root   root   4096 Mar 23 08:14 ..
+drwxr-xr-x  4 ubuntu ubuntu 4096 Mar 23 09:47 ubuntu
+drwxr-xr-x  5 root   root   4096 Mar 23 09:55 .
+drwxr-xr-x  3 temp   temp   4096 Mar 23 19:24 temp
+
+Change permission
+sudo chmod -R 0700 ubuntu
+ubuntu@ubuntu-xenial:/home  ls -ltra
+total 16
+drwxr-xr-x  4 root    root    4096 Mar 23 19:03 .
+drwxr-xr-x 24 root    root    4096 Mar 23 19:03 ..
+drwxr-xr-x  4 vagrant vagrant 4096 Mar 23 19:04 vagrant
+drwx------  3 ubuntu  ubuntu  4096 Mar 23 19:15 ubuntu
+
+Securing server
+sudo vi /etc/ssh/sshd_config
+PermitRootLogin no
+PasswordAuthentication no
+
+
+For firewall
+sudo yum install firewalld
+sudo systemctl enable firewalld
+sudo reboot
+sudo systemctl status firewalld
+sudo systemctl start firewalld
+sudo systemctl enable firewalld
+sudo firewall-cmd --zone=public --list-all
+sudo firewall-cmd --zone=public --add-service=http
+success
+sudo firewall-cmd --zone=public --list-services
+ssh dhcpv6-client http
+sudo firewall-cmd --permanent --zone=public --add-service=http
+success
+sudo firewall-cmd --permanent --zone=public --list-services
+ssh dhcpv6-client http
+sudo firewall-cmd --zone=public --add-port=32400/tcp
+success
+sudo firewall-cmd --zone=public --list-ports
+32400/tcp
+sudo firewall-cmd --zone=public --add-port=3050/tcp
+success
+sudo firewall-cmd --zone=public --add-port=80/tcp
+success
+sudo firewall-cmd --zone=public --add-port=443/tcp
+success
+
+
+Or 
+
+sudo yum install epel-release -y
+sudo yum install --enablerepo="epel" ufw -y
+sudo ufw enable 
+sudo ufw allow ssh
+  sudo ufw allow http
+  sudo ufw allow 443/tcp
+  sudo ufw --force enable
+sudo ufw status
+
+For centos 
+sudo systemctl restart sshd.service
+sudo systemctl enable sshd.service
+
+
+
+
+
+sudo apt-get install -y ufw
+
+
+To disable
+ufw disable 
+
+For default policy
+ufw default allow outgoing 
+ufw default deny incoming
+
+Add or delete firewall rules
+ufw allow http
+Or
+ufw allow 80 
+
+
+ufw deny 80
+
+ufw delete allow http 
+ufw delete deny 80
+
+
+Type ifconfig
+
+ssh raj@172.20.10.4
+
+To install docker
+
+sudo yum install -y yum-utils \
+  device-mapper-persistent-data \
+  lvm2
+
+sudo yum-config-manager \
+    --add-repo \
+    https://download.docker.com/linux/centos/docker-ce.repo
+
+In case the above command is failed.
+sudo vi /etc/yum.conf
+Add timeout:
+timeout=120
+
+sudo yum install docker-ce docker-ce-cli containerd.io
+
+
+TO install docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+sudo chmod +x /usr/local/bin/docker-compose
+
+
+Start docker service
+sudo systemctl start docker
+Or 
+service docker start
+
+
+If we didn't get docker server version
+
+//grant docker for user raj
+sudo usermod -aG docker raj
+
+Docker version
+
+To kill yum on going process
+ps aux | grep yum
+sudo kill processid
+
+To remove virtual box
+
+To check boxes
+ifconfig
+
+To remove vbox
+VBoxManage hostonlyif remove vboxnet3
+
+
+To install kubectl
+sudo curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+
+sudo chmod +x ./kubectl
+
+sudo mv ./kubectl /usr/local/bin/kubectl
+
+
+
+To install minikube
+curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+
+sudo chmod +x minikube
+
+sudo install minikube /usr/local/bin
+
+minikube start
+
+If you are running minikube inside vm, than try 
+sudo minikube start --vm-driver=none
+
+If we get below error,
+sudo: minikube: command not found
+
+Move minikube to below path
+
+sudo cp /usr/local/bin/minikube /usr/bin
+
+Check echo $PATH also, that it has /usr/bin/. if not add like below steps,
+export PATH=$PATH:/usr/bin/
+echo $PATH //to check path variables
+It is better add /usr/local/bin/ also,
+
+Now, try 
+sudo minikube start
+
+If not working 
+sudo minikube start --vm-driver=none 
+sudo minikube start
+
+
+sudo kubectl version
+

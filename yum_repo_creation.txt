@@ -1,0 +1,43 @@
+When there is no repo in yum
+
+vi /etc/yum.repos.d/example.repo
+[examplerepo]
+name=Example Repository
+baseurl=http://mirror.cisp.com/CentOS/6/os/i386/
+enabled=1
+gpgcheck=1
+gpgkey=http://mirror.cisp.com/CentOS/6/os/i386/RPM-GPG-KEY-CentOS-6
+
+yum install createrepo
+
+To Create Yum repository
+
+Take a backup of the repository folder.
+
+cd /etc
+Backup repository folder.
+
+cp -r yum.repos.d yum.repos.d-bak
+Delete all online repository files.
+
+rm -rf yum.repos.d/*
+Create locate repository file.
+
+vim yum.repos.d/local.repo
+Add the following line to the file for Centos 7.
+
+[centos7]
+name=centos7
+baseurl=file:///localrepo/
+enabled=1
+gpgcheck=0
+Then save and exit the file. For your information, here is what each of the items means in the above command.
+
+[centos7] – Name of the Section.
+name = Name of the repository
+baseurl = Location of the package
+Enabled = Enable repository
+gpgcheck= Enable secure installation
+gpgkey = Location of the key
+gpgcheck is optional (If you set gpgcheck=0, there is no need to mention gpgkey)
+
