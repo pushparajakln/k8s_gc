@@ -14,3 +14,88 @@ openssl aes-256-cbc -K $encrypted_0c35eebf403c_key -iv $encrypted_0c35eebf403c_i
 
 add encrypted_0c35eebf403c_key , encrypted_0c35eebf403c_iv will be added automatically. add DOCKER_USERNAME and DOCKER_PASSWORD in travis environment variables
 
+open google cloud console after travis 
+gcloud config set project <projectid>
+gcloud config set compute/zone us-central1-a
+gcloud container clusters get-credentials multi-cluster
+kubectl get pods
+kubectl create secret generic pgpassword --from-literal PGPASSWORD=mypgpassword
+
+google cloud does not have any idea on Nginx-ingress and we have to install it as a separate service.
+https://kubernetes.github.io/ingress-nginx/deploy/#gce-gke
+use generic yaml or helm to install nginx ingress
+
+NGINX Ingress controller can be installed via Helm using the chart stable/nginx-ingress from the official charts repository. 
+
+This time we will install through helm-tiller. helm-tiller is used to install third party software inside cluster
+helm - client
+tiller - server
+
+Helm installation:
+
+after helm installation, dont do helm init immediately
+
+also helm is used to give user role permission to change attributes in deployment objects. 
+Google cloud kubernetes by default enables RBAC- Role based access control. usually, the changes are blocked by default in production env like google cloud.
+By using helm, we can give user permission to change.
+
+
+Helm is a client that is going to take the commands and relay them to tiller.
+Tiller is a POD that is going to run inside our cluster.
+This pod running tiller is going to attempt make changes to configuration of the cluster.
+In other words, it is going to install new configuration, new sets of deployments and Secrets
+
+We are able to access kubectl commands because of our user accounts.
+Service account is to identify a pod inside a cluster.
+User account identifies you as a person, service account identifies that person to acess
+The pod . But actual ability to change something is not with them.
+Actually ability to change the state of cluster is with role bindings.
+We create a role binding and assign that to a user account or service account.
+There are 2 types of role bindings
+1. cluster role binding
+2. role binding
+
+Cluster role binding allows to change everything inside the cluster.
+A rolebinding on the other hand is only going to allow you to do a certain set of 
+Actions in a single namespace.
+We did not speak much about namespaces.
+But just to hav an idea, whenever we create a cluster some number of
+Namespaces are automatically created. Example: run the command kubectl get namespaces.
+
+
+Kube-system namespace contains a bunch of kubernetes objects that make your entire cluster
+The way you expect.
+If you want to you can isolate different sets of resources into different name spaces 
+and so you might for some reason want to create a role binding that only allows a particular service account 
+or a user account to make changes to objects in a single particular namespace.
+
+Definition of namespace:
+Namespaces are a way to divide cluster resources between multiple users (via resource quota). 
+In future versions of Kubernetes, objects in the same namespace will have the same access control policies by default.
+
+Now coming back to Tiller server, we need to set RBAC to it,
+Ideally tiller needs to access cluster, so we need to create a service account
+And cluster role binding for it.
+Now if you had big concerns around security you could definitely change this up.
+
+You could definitely create a service account and assign it to Tiller 
+but then instead assign it a rolebinding so that maybe Tiller is only able to make changes to a very specific namespace but for you.
+
+kubectl get namespaces
+
+we can create our own namespaces for pods 
+
+kubectl create serviceaccount --namespace kube-system tiller
+
+kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+
+now, initialize helm,
+helm init --service-account tiller --upgrade
+
+now, install nginx ingress
+helm install stable/nginx-ingress --name my-nginx --set rbac.create=true
+
+
+
+
+
