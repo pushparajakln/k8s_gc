@@ -1,57 +1,16 @@
-sudo kubectl get all --export=true -o yaml => to see yaml file for all running objects
+create project in google cloud platform
+IAM-> service accounts->create service account
+install ruby to run/install travis cli
+create encrypt file from service account json using travis cli
 
-sudo kubectl get deploy client-deployment -o yaml --export => to see yaml file for deployment
-sudo kubectl get services client-node-port -o yaml --export => to see yaml file for service
+docker run -it -v $(pwd):/app ruby:2.3 sh
+gem install travis
+travis
+travis login
+travis encrypt-file service-account.json -r pushparajakln/k8s_gc
+place enc file inside git repo
 
+openssl aes-256-cbc -K $encrypted_0c35eebf403c_key -iv $encrypted_0c35eebf403c_iv -in service-account.json.enc -out service-account.json -d
 
-sudo kubectl get -o=yaml --export deployment > client-deployment.yaml => to save yaml file for deployment object
+add encrypted_0c35eebf403c_key , encrypted_0c35eebf403c_iv will be added automatically. add DOCKER_USERNAME and DOCKER_PASSWORD in travis environment variables
 
-delete .travis.yml, dockerrun.aws.json and docker-compose.yml
-
-volume, persistent volume, persistant volume claim
-
-volume will be there even we delete the pod.
-
-persistent volume is a piece of storage in the cluster that has been provisioned by an administrator or dynamically provisioned using Storage Classes.
-because it will removed when pod is removed.
-
-persistent volume claim is a request for storage by a user. It is similar to a pod. Pods consume node resources and PVCs consume PV resources. 
-PersistentVolumeClaims allow a user to consume abstract storage resources, it is common that users need PersistentVolumes with varying properties, 
-such as performance, for different problems. 
-
-only PVC will be used others are deprecated
-
-clusterip service is restricted form of networking for pods. 
-pods/objects will communicate through clusterIP and it is not allowed for outside world like nodeport 
-
-accessmodes
-readwriteonce - can be used by a single node
-readonlymany - multiple nodes can read from this
-readwritemany - can be read and written to by many nodes
-
-Use secret object to store postgres password
-
-There are 3 types of secrets: 
-1. generic
-2. docker-registry
-3. tls(related to https setup
-
-Secrect creation is a imperative command. it is not mentioned in yml file
-
-sudo kubectl create secret generic pgpassword --from-literal PGPASSWORD=12345
-
-environment variables must be in string always
-
-we cannot use k8s load balancer because it communicates to single deployment. so go for ingress.
-
-ingress nginx
-ingress config(set of routing rules) feeded to kubectl and internally ingress controller/pod creates someting that accepts traffic.
-ingress has load balancer logic inside.
-
-
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/provider/cloud-generic.yaml
-
-minikube addons enable ingress
-
-kubectl get svc -n ingress-nginx
