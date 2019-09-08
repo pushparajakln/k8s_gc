@@ -95,7 +95,40 @@ helm init --service-account tiller --upgrade
 now, install nginx ingress
 helm install stable/nginx-ingress --name my-nginx --set rbac.create=true
 
+purchase domains from godaddy or domains.google.com
 
+go to google cloud console. select kubernetes engine->services->kubernetes services. 
+copy nginx ingress controller ip and add it on domains.google.com in DNS configuration in custom resource records
 
+to obtain a tls certificate, we will use certmanager project
+
+# Install the CustomResourceDefinition resources separately
+kubectl apply -f https://raw.githubusercontent.com/jetstack/cert-manager/release-0.10/deploy/manifests/00-crds.yaml
+
+# Create the namespace for cert-manager
+kubectl create namespace cert-manager
+
+# Label the cert-manager namespace to disable resource validation
+kubectl label namespace cert-manager certmanager.k8s.io/disable-validation=true
+
+# Add the Jetstack Helm repository
+helm repo add jetstack https://charts.jetstack.io
+
+# Update your local Helm chart repository cache
+helm repo update
+
+# Install the cert-manager Helm chart
+helm install \
+  --name cert-manager \
+  --namespace cert-manager \
+  --version v0.10.0 \
+  jetstack/cert-manager
+
+Lets encrypt - to get free certificates
+
+issuer yml file is to get certificate from lets encrypt by using certificate yml file via cert manager. 
+the tls certificate from lets encrypt will be stored as secret inside certificate  using cert manager
+
+after applying issuer.yml and certificate.yml. check kubectl get certificates and kubectl get secrets
 
 
